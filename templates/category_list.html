@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}
+Список автомобилей
+{% endblock %}
+{% block style %}
+{% include "inc-style.html" %}
+{% endblock %}
+{% block menu %}
+{% include "inc-menu.html" %}
+{% endblock %}
+{% block body %}
+{% block body %}
+    <a href="/">назад</a>
+
+    <h1>Список категорий</h1>
+    <ul>
+
+        {% for item in objects_list %}
+        <li>
+            {{item.name}} <span>Количество автомобилей: {{item.car_count()}}</span>
+        </li>
+        {% endfor %}
+    </ul>
+
+	<div>
+		<li><a href="/cars-list/">Список автомобилей</a></li>
+		<li><a href="/create-car/">Создать автомобиль</a></li>
+	</div>
+{% endblock %}

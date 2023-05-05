@@ -9,5 +9,17 @@
 	{% include "inc-menu.html" %}
 {% endblock %}
 {% block body %}
+	<div>
+		<a href="/create-category/">Создать новую категорию</a>
+	</div>
+	<div>
+		<h1>Список существующих категорий</h1>
+        {% for item in objects_list %}
+        <li>
+            {{item.name}} <span>Количество автомобилей: {{item.car_count()}}</span>
+			<a href="/cars-list/?id={{item.id}}">Показать автомобили</a>
+        </li>
+        {% endfor %}
+	</div>
 	{% include "inc-index-body.html" %}
 {% endblock %}
