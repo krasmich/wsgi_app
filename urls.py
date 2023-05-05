@@ -1,6 +1,6 @@
 from datetime import date
 
-from views import Index, ContactUs
+from views import Index, ContactUs, CategoryList, CreateCategory, CreateCars, CarsList, CopyCars
 
 
 def date_front(request):
@@ -15,5 +15,10 @@ fronts = [date_front, address_front]
 
 routes = {
     '/': Index(),
-    '/contact/': ContactUs()
+    '/contact/': ContactUs(),
+    '/cars-list/': CarsList(),
+    '/create-car/': CreateCars(),
+    '/create-category/': CreateCategory(),
+    '/category-list/': CategoryList(),
+    '/copy-car/': CopyCars()
 }
