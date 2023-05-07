@@ -1,17 +1,22 @@
 from framework.templator import render
+from patterns.structural_patterns import AppRoute
 from patterns.сreational_patterns import Engine, Logger
 
 site = Engine()
 logger = Logger('main')
 
+routes = {}
+
 
 # контроллер - главная страница
+@AppRoute(routes=routes, url='/')
 class Index:
     def __call__(self, request):
         return '200 OK', render('index.html', date=request.get('date', None))
 
 
 # контроллер - "Для связи"
+@AppRoute(routes=routes, url='/contact/')
 class ContactUs:
     def __call__(self, request):
         return '200 OK', render('contact.html', address=request.get('address', None))
@@ -24,6 +29,7 @@ class NotFound404:
 
 
 # контроллер - список автомобилей
+@AppRoute(routes=routes, url='/cars-list/')
 class CarsList:
     def __call__(self, request):
         logger.log('Список Автомобилей')
@@ -38,6 +44,7 @@ class CarsList:
 
 
 # контроллер - создать автомобиль
+@AppRoute(routes=routes, url='/create-car/')
 class CreateCars:
     category_id = -1
 
@@ -74,6 +81,7 @@ class CreateCars:
 
 
 # контроллер - создать категорию
+@AppRoute(routes=routes, url='/create-category/')
 class CreateCategory:
     def __call__(self, request):
 
@@ -103,6 +111,7 @@ class CreateCategory:
 
 
 # контроллер - список категорий
+@AppRoute(routes=routes, url='/category-list/')
 class CategoryList:
     def __call__(self, request):
         logger.log('Список категорий')
@@ -111,6 +120,7 @@ class CategoryList:
 
 
 # контроллер - копировать автомобиль
+@AppRoute(routes=routes, url='/copy-course/')
 class CopyCars:
     def __call__(self, request):
         request_params = request['request_params']
