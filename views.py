@@ -1,9 +1,15 @@
 from framework.templator import render
-from patterns.structural_patterns import AppRoute
+
+
+from patterns.structural_patterns import AppRoute, Debug
 from patterns.сreational_patterns import Engine, Logger
+from patterns.behavioral_patterns import EmailNotifier, SmsNotifier, \
+    ListView, CreateView, BaseSerializer
 
 site = Engine()
 logger = Logger('main')
+email_notifier = EmailNotifier()
+sms_notifier = SmsNotifier()
 
 routes = {}
 
@@ -61,6 +67,10 @@ class CreateCars:
                 category = site.find_category_by_id(int(self.category_id))
 
                 car = site.create_car('passenger_cars', name, category)
+
+                car.observers.append(email_notifier)
+                car.observers.append(sms_notifier)
+
                 site.cars.append(car)
 
             return '200 OK', render('car_list.html',
@@ -140,3 +150,48 @@ class CopyCars:
                                     name=new_car.category.name)
         except KeyError:
             return '200 OK', 'No courses have been added yet'
+
+
+@AppRoute(routes=routes, url='/client-list/')
+class ClientListView(ListView):
+    queryset = site.clients
+    template_name = 'client_list.html'
+
+
+@AppRoute(routes=routes, url='/create-client/')
+class ClientCreateView(CreateView):
+    template_name = 'create_client.html'
+
+    def create_obj(self, data: dict):
+        name = data['name']
+        name = site.decode_value(name)
+        new_obj = site.create_user('client', name)
+        site.clients.append(new_obj)
+
+
+@AppRoute(routes=routes, url='/add-client/')
+class AddClientByCarCreateView(CreateView):
+    template_name = 'add_client.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['cars'] = site.cars
+        context['clients'] = site.clients
+        return context
+
+    def create_obj(self, data: dict):
+        car_name = data['car_name']
+        car_name = site.decode_value(car_name)
+        car = site.get_car(car_name)
+        client_name = data['client_name']
+        client_name = site.decode_value(client_name)
+        client = site.get_client(client_name)
+        car.add_client(client)
+
+
+@AppRoute(routes=routes, url='/api/')
+class CarApi:
+    @Debug(name='CarApi')
+    def __call__(self, request):
+        return '200 OK', BaseSerializer(site.cars).save()
+
