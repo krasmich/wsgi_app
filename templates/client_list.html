@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}
+Создание клиента
+{% endblock %}
+{% block style %}
+	{% include "inc-style.html" %}
+{% endblock %}
+{% block menu %}
+	{% include "inc-menu.html" %}
+{% endblock %}
+{% block body %}
+	<div>
+		<li>
+			<a href="/create-client/">Создать клиента</a>
+		</li>
+		<li>
+			<a href="/add-client/">Привязать клиента к автомобилю</a>
+		</li>
+	</div>
+    <h1>Список клиентов</h1>
+    <div>
+
+        {% for item in objects_list %}
+        <li>
+            {{item.name}}
+            {% for car in item.cars %}
+                {{car.name}}
+            {% endfor %}
+        </li>
+        {% endfor %}
+    </div>
+{% endblock %}
