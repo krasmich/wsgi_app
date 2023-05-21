@@ -1,8 +1,8 @@
 from framework.templator import render
-
+from patterns.architectural_pattern import UnitOfWork
 
 from patterns.structural_patterns import AppRoute, Debug
-from patterns.сreational_patterns import Engine, Logger
+from patterns.сreational_patterns import Engine, Logger, MapperRegistry
 from patterns.behavioral_patterns import EmailNotifier, SmsNotifier, \
     ListView, CreateView, BaseSerializer
 
@@ -10,6 +10,9 @@ site = Engine()
 logger = Logger('main')
 email_notifier = EmailNotifier()
 sms_notifier = SmsNotifier()
+UnitOfWork.new_current()
+UnitOfWork.get_current().set_mapper_registry(MapperRegistry)
+
 
 routes = {}
 
@@ -154,8 +157,11 @@ class CopyCars:
 
 @AppRoute(routes=routes, url='/client-list/')
 class ClientListView(ListView):
-    queryset = site.clients
     template_name = 'client_list.html'
+
+    def get_queryset(self):
+        mapper = MapperRegistry.get_current_mapper('client')
+        return mapper.all()
 
 
 @AppRoute(routes=routes, url='/create-client/')
@@ -167,6 +173,8 @@ class ClientCreateView(CreateView):
         name = site.decode_value(name)
         new_obj = site.create_user('client', name)
         site.clients.append(new_obj)
+        new_obj.mark_new()
+        UnitOfWork.get_current().commit()
 
 
 @AppRoute(routes=routes, url='/add-client/')
@@ -194,4 +202,3 @@ class CarApi:
     @Debug(name='CarApi')
     def __call__(self, request):
         return '200 OK', BaseSerializer(site.cars).save()
-
